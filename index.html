@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Our Funky HTML Page</title>
+    <meta name="description" content="Our first page">
+    <meta name="keywords" content="html tutorial template">
+</head>
+
+<body>
+    <h1>Ventes 2022</h1>
+    <div id="beziersDemoContainer">
+        <div id="graphContainer"></div>
+        <canvas id="drawingContext"></canvas>
+    </div>
+    <script defer>
+        const svgns = "http://www.w3.org/2000/svg";
+        let viewPortMaxUnitX = 8000;
+        let viewPortMaxUnitY = 9000;
+        let tailleGraph = 7000;
+        let echelle = 1000;
+        let viewport = null;
+        init_UI();
+        function init_UI() {
+            insertViewPort("graphContainer");
+            initGraph(tailleGraph, tailleGraph, echelle);
+        }
+        function insertViewPort(containerId) {
+            viewport = document.createElementNS(svgns, "svg");
+            viewport.setAttribute("id", "viewport");
+            viewport.setAttribute("viewBox", "0 0 " + viewPortMaxUnitX + " " + viewPortMaxUnitY);
+            document.getElementById(containerId).appendChild(viewport);
+        }
+        function initGraph(tailleGraph, graduationDepart, échelle) {
+            let mois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+            let ventes = [6500, 5550, 4200, 4525, 2500, 1500, 500, 1000, 1750, 2300, 3700, 3500];
+            let graduation = graduationDepart;
+            let pointMoisX = 1250;
+            let pointBandeX = 1125;
+
+            //Boucle qui créer les lignes du graphique avec la graduation.
+            for (let i = 0; i <= tailleGraph; i++) {
+                if (i == 0) {
+                    viewport.appendChild(text(525, i+125, `${graduation}$`, 0, 10));
+                    viewport.appendChild(line(1000, i+75, tailleGraph, i+50, "#000000", 10))
+                    graduation -= échelle;
+                }
+                if (i % 1000 == 0) //ligne foncée.
+                {
+                    if (i * 100 > 0) {
+                        viewport.appendChild(text(525, i+125, `${graduation}$`, 0, 10));
+                        viewport.appendChild(line(1000, i+75, tailleGraph, i+50, "#000000", 10))
+                        graduation -= échelle;
+                    }
+                }
+                if (i % 100 == 0) //ligne pale.
+                {
+                    if (i * 100 > 0) {
+                        viewport.appendChild(line(1000, i+75, tailleGraph, i+50, "#999999", 10))
+                    }
+                }
+            }
+
+            //Boucle qui écrit les mois en-dessous du graphique.
+            for(let j = 0; j < mois.length; ++j)
+            {
+                viewport.appendChild(text(pointMoisX, tailleGraph+180, `${mois[j]}`, 55, 10));
+                pointMoisX += 500;
+            }
+
+            //Boucle qui créer les bandes du graphique ainsi que la valeur de la bande au-dessus de celle-ci.
+            for(let m = 0; m < mois.length; ++m)
+            {
+                let couleurBande = "green";
+                if(ventes[m] <= 1000)
+                {
+                    couleurBande = "red";
+                }
+                else if(ventes[m] > 1000 && ventes[m] <= 3000)
+                {
+                    couleurBande = "orange";
+                }
+                else if(ventes[m] > 3000 && ventes[m] <= 4200)
+                {
+                    couleurBande = "yellow";
+                }
+                viewport.appendChild(rect(pointBandeX, tailleGraph-ventes[m]+67, 300, ventes[m], couleurBande));
+                viewport.appendChild(text(pointBandeX, tailleGraph-ventes[m], `${ventes[m]}$`, 0, 10));
+                pointBandeX += 500;
+            }
+        }
+
+        /*viewport.appendChild(line(20, 20, 400, 200, 'green', 15))
+        viewport.appendChild(line(20, 20, 400, 150, 'red', 15))
+        viewport.appendChild(line(20, 20, 400, 100, 'blue', 15))
+        viewport.appendChild(line(20, 20, 400, 50, 'orange', 15))
+        viewport.appendChild(rect(500, 20, 300, 200, 'orange', 'yellow', 15))
+        viewport.appendChild(rect(500, 300, 300, 200, 'magenta', 'cyan', 15))
+        let gray;
+        for (let angle = 360; angle >= 0; angle -= 15) {
+            gray = angle / 360 * 255;
+            viewport.appendChild(text(220, 400, 'Bonjour', angle, 4, `rgb(${gray}, ${gray}, ${gray})`))
+        }*/
+        function line(x1, y1, x2, y2, stroke = "black", strokeWidth = 1) {
+            let line = document.createElementNS(svgns, "line");
+            line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+            line.setAttribute("stroke", stroke);
+            line.setAttribute("stroke-width", strokeWidth);
+            return line;
+        }
+        function rect(x, y, width, height, fill = "white", stroke = "black", strokeWidth = 1) {
+            let rect = document.createElementNS(svgns, "rect");
+            rect.setAttribute("x", x); rect.setAttribute("y", y);
+            rect.setAttribute("width", width); rect.setAttribute("height", height);
+            rect.setAttribute("fill", fill); rect.setAttribute("stroke", stroke);
+            rect.setAttribute("stroke-width", strokeWidth);
+            return rect;
+        }
+        function text(x, y, content, angle = 0, size = "1", fill = "black") {
+            let text = document.createElementNS(svgns, "text");
+            text.setAttribute("x", x); text.setAttribute("y", y);
+            text.setAttribute("transform", `rotate(${angle},${x},${y})`);
+            text.setAttribute("font-size", size + "em");
+            text.setAttribute("fill", fill);
+            text.innerHTML = content;
+            return text;
+        }
+    </script>
+</body>
+
+</html>
